@@ -20,6 +20,9 @@ Route::post('/users/authenticate','Api\UsersController@authenticate');
 
 Route::group([], function(){
     Route::resource('/users','Api\UsersController');
+    Route::resource('/products','Api\ProductsController');
+    Route::resource('/sizes', 'Api\SizesController');
+    Route::resource('/sales', 'Api\SalesController');
 });
 
-Route::resource('/products','Api\ProductsController');
+
