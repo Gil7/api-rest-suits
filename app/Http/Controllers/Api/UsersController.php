@@ -60,6 +60,7 @@ class UsersController extends Controller
         $user->username = $request->input('username');
         $user->email = $request->input('email');
         $user->phone = $request->input('phone');
+        $user->isAdmin = $request->input('isAdmin');
         $user->password = bcrypt($request->input('password'));
         try{
             $user->save();

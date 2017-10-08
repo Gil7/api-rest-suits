@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::post('/users/authenticate','Api\UsersController@authenticate');
 
-Route::group(['middleware' => 'api'], function(){
+Route::group([], function(){
     Route::resource('/users','Api\UsersController');
 });
 
