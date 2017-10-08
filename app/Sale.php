@@ -8,7 +8,7 @@ class Sale extends Model
 {
     protected $table = 'sales';
     protected $fillable = [
-        'nameClient'
+        'nameClient',
     ];
 
     public function products(){
