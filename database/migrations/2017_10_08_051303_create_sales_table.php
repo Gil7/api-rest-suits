@@ -21,11 +21,11 @@ class CreateSalesTable extends Migration
         Schema::create('product_sale', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('quantity');
-            $table->decimal('price',5,2);
+            $table->decimal('price',7,2);
             $table->integer('product_id')->unsigned();
             $table->foreign('product_id')->references('id')->on('products');
             $table->integer('sale_id')->unsigned();
-            $table->foreign('sale_id')->references('id')->on('products');
+            $table->foreign('sale_id')->references('id')->on('sales');
             $table->timestamps();
         });
     }
@@ -37,6 +37,7 @@ class CreateSalesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('product_sale');
         Schema::dropIfExists('sales');
     }
 }
