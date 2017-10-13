@@ -27,7 +27,13 @@ class UsersController extends Controller
         }catch (\JWTException $e){
             return response()->json(['error' => 'could not create the token'],500);
         }
-        return response()->json(['token' => $token],200);
+        $user = \JWTAuth::toUser($token);
+        return response()->json(['token' => $token, 'user' => $user],200);
+    }
+    public function profile(Request $request) {
+        $token  = \JWTAuth::getToken();
+        $user = \JWTAuth::toUser($token);
+        return $user;
     }
     public function index()
     {
@@ -102,7 +108,9 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        User::where('id', $id)->update($request->all());
+        $user = User::find($id);
+        return response()->json($user);
     }
 
     /**
