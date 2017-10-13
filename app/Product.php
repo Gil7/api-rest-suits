@@ -8,7 +8,7 @@ class Product extends Model
 {
     protected $table = 'products';
     protected $fillable = [
-        'name', 'description','price','stock'
+        'name', 'description','price','stock','rental'
     ];
     public function sizes(){
         return $this->belongsToMany('App\Size','product_size');
