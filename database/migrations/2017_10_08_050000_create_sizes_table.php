@@ -36,6 +36,7 @@ class CreateSizesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('product_size');
         Schema::dropIfExists('sizes');
     }
 }
