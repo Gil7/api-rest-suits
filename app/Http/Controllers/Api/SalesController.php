@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 use App\Http\Controllers\Controller;
 use App\Sale;
+use Carbon\Carbon;
 class SalesController extends Controller
 {
     /**
@@ -17,7 +21,18 @@ class SalesController extends Controller
         $sales = Sale::all();
         return response()->json($sales);
     }
-
+    public function salestoday(){
+        $now = Carbon::now()->format('Y-m-d');
+        $startDay = $now.' 00:00:00';
+        $endDay = $now.' 23:59:00';
+        $sales = DB::table('product_sale as ps')
+            ->join('products as p','p.id','=','ps.product_id')
+            ->join('sales as s','s.id','=','ps.sale_id')
+            ->select('p.name','ps.created_at','ps.price','ps.quantity','s.nameClient')
+            ->whereBetween('ps.created_at', [$startDay, $endDay])
+            ->get();
+        return response()->json(['sales' => $sales]);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -36,16 +51,18 @@ class SalesController extends Controller
      */
     public function store(Request $request)
     {
+        //get the user from request
+        $token  = \JWTAuth::getToken();
+        $user = \JWTAuth::toUser($token);
+        //end to get user
         $sale = new Sale();
-        $sale->nameClient = $request->input('client');
+        $sale->nameClient = $user->name;
         $sale->save();
-        foreach ($request->products as $product) {
-            $current_id = $product['id'];
-            $current_price = $product['price'];
-            $current_quantity = $product['quantity'];
-            $sale->products()->attach([$current_id => ['price' => $current_price, 'quantity' => $current_quantity]]);
-        }
-        return response()->json($sale);
+        $sale->products()->attach([$request->product_id => [ 'quantity' => $request->quantity, 'price' => $request->price, 'created_at' => $sale->created_at]]);
+        $product = Product::find($request->product_id);
+        $product->stock -= $request->quantity;
+        $product->save();
+        return response()->json(['success' => true, 'sale' => $sale, 'product' => $product]);
     }
 
     /**
@@ -82,7 +99,10 @@ class SalesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        return response()->json($request->all());
+        $sale = Sale::create($request->name);
+        $sale->products()->attach([$request->product_id => [ 'quantity' => $request->quantity, 'price' => $request->price]]);
+        return response()->json(['success' => true, 'sale' => $sale]);
     }
 
     /**
