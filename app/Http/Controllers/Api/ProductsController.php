@@ -12,8 +12,18 @@ class ProductsController extends Controller
 {
     //return all products registered
     public function index(){
-        $products = Product::all();
-        return response()->json(['products' => $products, 'success' => true],200);
+        $products = Product::paginate(10);
+        return [
+            'paginate' => [
+                'total' => $products->total(),
+                'current_page' => $products->currentPage(),
+                'per_page' => $products->perPage(),
+                'last_page' => $products->lastPage(),
+                'from' => $products->firstItem(),
+                'to' => $products->lastPage()
+            ],
+            'products' => $products
+        ];
     }
     //create a new product
     public function store(Request $request){
@@ -21,6 +31,7 @@ class ProductsController extends Controller
             'name' => 'required',
             'description' => 'required',
             'price' => 'required',
+            'rental' => 'required',
             'stock' => 'required',
         ]);
         if ($validation->fails()){
@@ -36,15 +47,30 @@ class ProductsController extends Controller
         $product->sizes;
         return response()->json($product);
     }
+    public function productByName($name){
+        $product = Product::where('name','like','%'.$name.'%')->get();
+        return response()->json($product);
+    }
+    //update a product
+    public function update(Request $request, $id){
+        $product = Product::find($id);
+        $product->name = $request->name;
+        $product->description = $request->description;
+        $product->price = $request->price;
+        $product->rental = $request->rental;
+        $product->stock = $request->stock;
+        $product->save();
+        //remove the sizes from intermediate table
+        $product->sizes()->detach();
+        //refresh the data on the intermediate table :)
+        $product->sizes()->attach($request->sizes);
+        return response()->json($product);
+    }
     //delete a product
-    public function delete($id){
-        try{
-            $product = Product::findOrFail($id);
-            $product->delete();
-            return response()->json(['success'=> true, 'message' => 'product deleted correctly']);
-        }catch (Exception $e){
-            return response()->json(['success' => false, 'message' => 'Error deleting product']);
-        }
+    public function destroy($id){
+
+        Product::destroy($id);
+        return response()->json(['success' => true, 'message' => 'Product deleted correclty']);
     }
     public function addSizes($idProduct, $sizes){
         $product = Product::find($idProduct);
