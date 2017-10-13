@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+
 use App\Size;
 class SizesController extends Controller
 {
@@ -17,7 +19,12 @@ class SizesController extends Controller
         $sizes = Size::all();
         return response()->json($sizes);
     }
-
+    public function posibleSizes(Request $request) {
+        $sizes = DB::table('sizes')
+            ->whereNotIn('id', $request->sizes)
+            ->get();
+        return response()->json($sizes);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -36,7 +43,8 @@ class SizesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $size = Size::create($request->all());
+        return response()->json($size);
     }
 
     /**
@@ -47,7 +55,7 @@ class SizesController extends Controller
      */
     public function show($id)
     {
-        //
+
     }
 
     /**
@@ -70,7 +78,7 @@ class SizesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
     }
 
     /**
