@@ -14,3 +14,8 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/download', function () {
+    return response()->download('favicon.ico');
+});
+
