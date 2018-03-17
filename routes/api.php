@@ -28,6 +28,7 @@ Route::group(['middleware' => ['jwt.auth']], function(){
     Route::resource('/sizes', 'Api\SizesController');
     Route::resource('/sales', 'Api\SalesController');
     Route::resource('/rentals', 'Api\RentalsController');
+    Route::resource('/rentals', 'Api\RentalsController');
 });
 Route::resource('/statistics','Api\StatisticsController');
 
